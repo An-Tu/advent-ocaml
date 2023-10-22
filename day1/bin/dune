@@ -1,0 +1,13 @@
+(executable
+ (name main_iter)
+ (public_name day1_iter)
+ (package day1)
+ (modules main_iter)
+ (libraries lib iter))
+
+(executable
+ (name main_seq)
+ (public_name day1_seq)
+ (package day1)
+ (modules main_seq)
+ (libraries lib))
