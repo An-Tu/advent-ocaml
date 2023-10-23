@@ -7,9 +7,9 @@
 (source
  (github An-Tu/advent-ocaml))
 
-(authors "An_Tu")
+(authors "An-Tu")
 
-(maintainers "An_Tu")
+(maintainers "An-Tu")
 
 (package
  (name day1)
