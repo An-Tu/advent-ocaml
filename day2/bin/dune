@@ -1,0 +1,6 @@
+(executable
+ (public_name day2)
+ (name main)
+ (flags (-w @a-32))
+ (preprocess (pps ppx_deriving.show))
+ (libraries lib iter))
