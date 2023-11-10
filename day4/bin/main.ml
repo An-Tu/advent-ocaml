@@ -2,7 +2,7 @@ module Range : sig
   type t
 
   val ( -- ) : int -> int -> t
-  val contains_range : t -> t -> bool
+  val contains_or_is_contained : t -> t -> bool
 end = struct
   type t = int * int
 
@@ -13,17 +13,35 @@ end = struct
 
   let contains_range smaller bigger =
     bigger |> contains (smaller |> start) && bigger |> contains (smaller |> end_)
+
+  let contains_or_is_contained r1 r2 =
+    r1 |> contains_range r2 || r2 |> contains_range r1
 end
 
-let print_bool b =
-  b |> string_of_bool |> print_string;
-  print_newline ()
+exception Invalid_Params of string
 
-let () =
+let redundant =
   let open Range in
-  let a = 2 -- 4 |> contains_range (6 -- 8) in
-  let b = 6 -- 8 |> contains_range (2 -- 4) in
-  let c = 4 -- 6 |> contains_range (6 -- 6) in
-  print_bool a;
-  print_bool b;
-  print_bool c
+  Lib.Files.read_lines_iter "./input.txt"
+  |> Iter.filter_map
+       (Option.map (fun l ->
+            match
+              l |> String.split_on_char ','
+              |> List.map (fun range ->
+                     match
+                       range |> String.split_on_char '-'
+                       |> List.map int_of_string
+                     with
+                     | [ start; end_ ] -> start -- end_
+                     | _ ->
+                         raise
+                           (Invalid_Params
+                              "each range should have a start and end"))
+            with
+            | [ r1; r2 ] -> (r1, r2)
+            | _ -> raise (Invalid_Params "each line must have a pair of ranges")))
+  |> Iter.filter_count (fun (r1, r2) -> r1 |> Range.contains_or_is_contained r2)
+;;
+
+print_int redundant;
+print_newline ()
