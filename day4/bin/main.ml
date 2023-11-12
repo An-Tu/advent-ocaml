@@ -3,6 +3,7 @@ module Range : sig
 
   val ( -- ) : int -> int -> t
   val contains_or_is_contained : t -> t -> bool
+  val overlaps_or_is_overlapped : t -> t -> bool
 end = struct
   type t = int * int
 
@@ -11,11 +12,16 @@ end = struct
   let end_ (_, to_) = to_
   let contains n (from, to_) = from <= n && to_ >= n
 
-  let contains_range smaller bigger =
-    bigger |> contains (smaller |> start) && bigger |> contains (smaller |> end_)
+  let overlaps other self =
+    self |> contains (other |> start) || self |> contains (other |> end_)
+
+  let contains_range other self =
+    self |> contains (other |> start) && self |> contains (other |> end_)
 
   let contains_or_is_contained r1 r2 =
     r1 |> contains_range r2 || r2 |> contains_range r1
+
+  let overlaps_or_is_overlapped r1 r2 = r1 |> overlaps r2 || r2 |> overlaps r1
 end
 
 exception Invalid_Params of string
@@ -40,7 +46,7 @@ let redundant =
             with
             | [ r1; r2 ] -> (r1, r2)
             | _ -> raise (Invalid_Params "each line must have a pair of ranges")))
-  |> Iter.filter_count (fun (r1, r2) -> r1 |> Range.contains_or_is_contained r2)
+  |> Iter.filter_count (fun (r1, r2) -> r1 |> Range.overlaps_or_is_overlapped r2)
 ;;
 
 print_int redundant;
