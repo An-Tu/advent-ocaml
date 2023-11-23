@@ -1,0 +1,3 @@
+(test
+ (name day6)
+ (libraries alcotest lib))
