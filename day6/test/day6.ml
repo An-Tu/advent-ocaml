@@ -10,14 +10,14 @@ let () =
       ( "find marker",
         [
           test_case "test 1" `Quick
-            (test_find_marker 7 "mjqjpqmgbljsphdztnvjfqwrcgsmlb");
+            (test_find_marker 25 "mjqjpqmgbljsphdztnvjfqwrcgsmlb");
           test_case "test 2" `Quick
-            (test_find_marker 5 "bvwbjplbgvbhsrlpgdmjqwftvncz");
+            (test_find_marker 23 "bvwbjplbgvbhsrlpgdmjqwftvncz");
           test_case "test 3" `Quick
-            (test_find_marker 6 "nppdvjthqldpwncqszvftbrmjlhg");
+            (test_find_marker 23 "nppdvjthqldpwncqszvftbrmjlhg");
           test_case "test 4" `Quick
-            (test_find_marker 10 "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg");
+            (test_find_marker 29 "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg");
           test_case "test 5" `Quick
-            (test_find_marker 11 "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw");
+            (test_find_marker 26 "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw");
         ] );
     ]

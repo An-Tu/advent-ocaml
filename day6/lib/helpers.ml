@@ -1,39 +1,38 @@
-let[@inline] batching_iter fn seq k = fn seq k
+exception Return of int
 
-module SS = Set.Make (Char)
+let sequence_size = 14
+let get_char_code_from_bytes i bytes = i |> Bytes.get bytes |> Char.code
 
-let tuple_len = 4
+module State = struct
+  type t = int array
 
-let make_tuple_4_buffer () =
-  let acc = ref (None, None, None, None) in
-  fun x ->
-    (match !acc with
-    | None, None, None, None -> acc := (Some x, None, None, None)
-    | Some a, None, None, None -> acc := (Some a, Some x, None, None)
-    | Some a, Some b, None, None -> acc := (Some a, Some b, Some x, None)
-    | Some a, Some b, Some c, None -> acc := (Some a, Some b, Some c, Some x)
-    | Some _, Some b, Some c, Some d -> acc := (Some b, Some c, Some d, Some x)
-    | _ -> failwith "unreachable case");
-    !acc
+  let make size = Array.make size 0
+  let push c t = t.(c) <- t.(c) + 1
+  let pop c t = t.(c) <- t.(c) - 1
+  let is_unique t = t |> Array.for_all (fun count -> count <= 1)
+end
 
 let find_marker str =
-  str |> Iter.of_str
-  |> batching_iter (fun it next ->
-         let tuple_buffer = make_tuple_4_buffer () in
-         it (fun x ->
-             match tuple_buffer x with
-             | Some a, Some b, Some c, Some d -> next (a, b, c, d)
-             | _ -> ()))
-  |> Iter.findi (fun idx (a, b, c, d) ->
-         let arr = Array.make 256 false in
-         if
-           [ a; b; c; d ]
-           |> List.exists (fun el ->
-                  let code = Char.code el in
-                  let exists = Array.get arr code in
-                  Array.set arr code true;
-                  exists)
-         then None
-         else Some idx)
-  |> Option.map (fun position -> position + tuple_len)
-  |> Option.value ~default:0
+  let bytes = str |> Bytes.of_string in
+  if Bytes.length bytes < sequence_size then failwith "string too short"
+  else
+    let state = State.make 256 in
+    for i = 0 to sequence_size do
+      let b = get_char_code_from_bytes i bytes in
+      State.push b state
+    done;
+
+    if State.is_unique state then sequence_size
+    else
+      try
+        for i = 0 to Bytes.length bytes do
+          let remove_char_code_in_window = get_char_code_from_bytes i bytes in
+          let add_char_code_in_window =
+            get_char_code_from_bytes (i + sequence_size + 1) bytes
+          in
+          State.pop remove_char_code_in_window state;
+          State.push add_char_code_in_window state;
+          if State.is_unique state then raise (Return (i + 1 + sequence_size))
+        done;
+        raise (Return 0)
+      with Return idx -> idx
