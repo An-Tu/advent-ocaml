@@ -1,0 +1,18 @@
+(lang dune 3.11)
+
+(name day7)
+
+(generate_opam_files true)
+
+(source
+ (github An-Tu/advent-ocaml))
+
+(authors "An-Tu")
+
+(maintainers "An-Tu")
+
+(package
+ (name day7)
+ (depends ocaml dune iter angstrom))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
